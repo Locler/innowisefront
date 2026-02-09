@@ -32,7 +32,7 @@ function Login() {
                         <label className="form-label">Username</label>
                         <input
                             className="form-control"
-                            placeholder="Введите username"
+                            placeholder="Введите логин"
                             value={username}
                             onChange={e => setUsername(e.target.value)}
                         />

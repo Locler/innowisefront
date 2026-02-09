@@ -5,7 +5,18 @@ class AuthService {
         const res = await api.login(username, password);
         localStorage.setItem('accessToken', res.data.accessToken);
         localStorage.setItem('refreshToken', res.data.refreshToken);
-        return res.data;
+
+        const validation = await api.validate(res.data.accessToken);
+        localStorage.setItem('userId', validation.data.userId);
+        localStorage.setItem('role', validation.data.role); // сохраняем роль
+    }
+
+    getUserId() {
+        return localStorage.getItem('userId');
+    }
+
+    getRole() {
+        return localStorage.getItem('role');
     }
 
     async register(userId, username, password, role = 'USER') {
@@ -23,6 +34,8 @@ class AuthService {
     logout() {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('role');
     }
 }
 
