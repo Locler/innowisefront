@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import OrderService from '../../services/OrderService';
-import OrderItemService from '../../services/OrderItemService';
 
 function AdminOrders() {
     const [orders, setOrders] = useState([]);
-    const [orderItems, setOrderItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -16,11 +14,8 @@ function AdminOrders() {
         setLoading(true);
         setError(null);
         try {
-            const ordersRes = await OrderService.getAllOrders({ page: 0, size: 100 });
-            const itemsRes = await OrderItemService.getAllOrderItems({ page: 0, size: 100 });
-
-            setOrders(ordersRes.content || []);
-            setOrderItems(itemsRes.content || []);
+            const res = await OrderService.getAllOrders({ page: 0, size: 100 });
+            setOrders(res.content || []);
         } catch (e) {
             setError(e.message);
         } finally {
@@ -34,33 +29,34 @@ function AdminOrders() {
             {error && <div className="alert alert-danger">{error}</div>}
             {loading && <div>Загрузка...</div>}
 
-            <table className="table table-striped">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Пользователь</th>
-                    <th>Статус</th>
-                    <th>Сумма</th>
-                    <th>Элементы заказа</th>
-                </tr>
-                </thead>
-                <tbody>
-                {orders.map(order => (
-                    <tr key={order.id}>
-                        <td>{order.id}</td>
-                        <td>{order.user?.name || order.userId || '—'}</td>
-                        <td>{order.status}</td>
-                        <td>{order.totalPrice}</td>
-                        <td>
-                            {orderItems
-                                .filter(oi => oi.orderId === order.id)
-                                .map(oi => `Item ${oi.itemId} x${oi.quantity}`)
-                                .join(', ')}
-                        </td>
+            {!loading && !error && (
+                <table className="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Пользователь</th>
+                        <th>Статус</th>
+                        <th>Сумма</th>
+                        <th>Элементы заказа</th>
                     </tr>
-                ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {orders.map(owu => (
+                        <tr key={owu.order?.id}>
+                            <td>{owu.order?.id}</td>
+                            <td>{owu.user?.name || '—'}</td>
+                            <td>{owu.order?.status}</td>
+                            <td>{owu.order?.totalPrice?.toFixed(2) || 0} ₽</td>
+                            <td>
+                                {owu.order?.orderItems?.length
+                                    ? owu.order.orderItems.map(oi => `Item ${oi.itemId} x${oi.quantity}`).join(', ')
+                                    : '—'}
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            )}
         </div>
     );
 }

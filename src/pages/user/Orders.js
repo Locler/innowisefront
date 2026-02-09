@@ -49,16 +49,16 @@ function Orders() {
                 </tr>
                 </thead>
                 <tbody>
-                {orders.map(order => (
-                    <tr key={order.id}>
-                        <td>{order.id}</td>
-                        <td>{order.status}</td>
-                        <td>{order.totalPrice}</td>
+                {orders.map(owu => (
+                    <tr key={owu.order?.id}>
+                        <td>{owu.order?.id}</td>
+                        <td>{owu.user?.name || '—'}</td>
+                        <td>{owu.order?.status}</td>
+                        <td>{owu.order?.totalPrice?.toFixed(2) || 0} ₽</td>
                         <td>
-                            {orderItems
-                                .filter(oi => oi.orderId === order.id)
-                                .map(oi => `Item ${oi.itemId} x${oi.quantity}`)
-                                .join(', ')}
+                            {owu.order?.orderItems?.length
+                                ? owu.order.orderItems.map(oi => `Item ${oi.itemId} x${oi.quantity}`).join(', ')
+                                : '—'}
                         </td>
                     </tr>
                 ))}
