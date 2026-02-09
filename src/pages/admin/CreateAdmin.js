@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AuthService from '../..//services/AuthService';
+import AuthService from "../../services/AuthService";
 
 function CreateAdmin() {
     const [username, setUsername] = useState('');

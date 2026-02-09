@@ -1,9 +1,12 @@
+
 import axios from 'axios';
 
 const authHeader = () => ({
     Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-    'X-User-Roles': localStorage.getItem('userRoles') || 'ADMIN'
+    'X-User-Roles': localStorage.getItem('userRoles') || '',
+    'X-User-Id': localStorage.getItem('userId') || ''
 });
+
 
 export const getAllUsers = (params) =>
     axios.get('/users', { params, headers: authHeader() });

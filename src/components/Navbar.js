@@ -1,13 +1,12 @@
 import { Link } from 'react-router-dom';
 
 function Navbar() {
-    const roles = localStorage.getItem('role') || '';
+    const roles = (localStorage.getItem('userRoles') || '').split(',');
     const isLoggedIn = !!localStorage.getItem('accessToken');
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-white shadow mb-4 py-3">
             <div className="container-fluid px-3">
-                {/* Логотип крупнее */}
                 <Link className="navbar-brand fw-bold fs-2" to="/">Innowise</Link>
 
                 <button
@@ -32,13 +31,25 @@ function Navbar() {
                                 <li className="nav-item mx-2">
                                     <Link className="btn btn-outline-primary btn-lg" to="/cards">Карты</Link>
                                 </li>
+                                <li className="nav-item mx-2">
+                                    <Link className="btn btn-outline-primary btn-lg" to="/items">Товары</Link>
+                                </li>
+                                <li className="nav-item mx-2">
+                                    <Link className="btn btn-outline-primary btn-lg" to="/orders">Заказы</Link>
+                                </li>
                                 {roles.includes('ADMIN') && (
                                     <>
                                         <li className="nav-item mx-2">
-                                            <Link className="btn btn-primary btn-lg" to="/admin/users">Админ</Link>
+                                            <Link className="btn btn-primary btn-lg" to="/admin/users">Админ — Пользователи</Link>
                                         </li>
                                         <li className="nav-item mx-2">
-                                            <Link className="btn btn-warning btn-lg" to="/create-admin">Создать админа</Link>
+                                            <Link className="btn btn-primary btn-lg" to="/admin/cards">Админ — Карты</Link>
+                                        </li>
+                                        <li className="nav-item mx-2">
+                                            <Link className="btn btn-primary btn-lg" to="/admin/items">Админ — Товары</Link>
+                                        </li>
+                                        <li className="nav-item mx-2">
+                                            <Link className="btn btn-primary btn-lg" to="/admin/orders">Админ — Заказы</Link>
                                         </li>
                                     </>
                                 )}
