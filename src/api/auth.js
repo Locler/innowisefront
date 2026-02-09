@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Относительный путь через API Gateway в k8s
+// Относительный путь через API Gateway в k8s const API_BASE = process.env.REACT_APP_API_GATEWAY_URL || 'http://innowise.local';
 const API_URL = '';
 
 export const login = (username, password) =>

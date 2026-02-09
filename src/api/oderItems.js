@@ -6,18 +6,20 @@ const authHeader = () => ({
     'X-User-Id': localStorage.getItem('userId') || ''
 });
 
+const API_URL = '';
+
 // ORDER ITEMS
 export const getOrderItem= (id) =>
-    axios.get(`/orderItems/${id}`, { headers: authHeader() });
+    axios.get(`${API_URL}/orderItems/${id}`, { headers: authHeader() });
 
 export const getAllOrderItems = (params) =>
-    axios.get('/orderItems', { params, headers: authHeader() });
+    axios.get(`${API_URL}/orderItems`, { params, headers: authHeader() });
 
 export const createOrderItem = (dto) =>
-    axios.post('/orderItems', dto, { headers: authHeader() });
+    axios.post(`${API_URL}/orderItems`, dto, { headers: authHeader() });
 
 export const updateOrderItem = (id, dto) =>
-    axios.put(`/orderItems/${id}`, dto, { headers: authHeader() });
+    axios.put(`${API_URL}/orderItems/${id}`, dto, { headers: authHeader() });
 
 export const deleteOrderItem = (id) =>
-    axios.delete(`/orderItems/${id}`, { headers: authHeader() });
+    axios.delete(`${API_URL}/orderItems/${id}`, { headers: authHeader() });
