@@ -6,7 +6,7 @@ const API_URL = '';
 export const login = (username, password) =>
     axios.post(`${API_URL}/auth/login`, { username, password });
 
-export const register = (userId, username, password, role = 'USER') =>
+export const register = (userId, username, password, role = 'ROLE_USER') =>
     axios.post(`${API_URL}/auth/register`, { userId, username, password, role });
 
 export const validate = (token) =>

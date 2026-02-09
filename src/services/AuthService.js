@@ -19,7 +19,7 @@ class AuthService {
         return localStorage.getItem('role');
     }
 
-    async register(userId, username, password, role = 'USER') {
+    async register(userId, username, password, role = 'ROLE_USER') {
         await api.register(userId, username, password, role);
     }
 

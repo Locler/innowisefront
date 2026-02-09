@@ -56,6 +56,7 @@ function Login() {
                     <small>Нет аккаунта? <a href="/register">Зарегистрируйтесь</a></small>
                 </div>
             </div>
+
         </div>
     );
 }

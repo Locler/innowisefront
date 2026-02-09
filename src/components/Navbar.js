@@ -37,6 +37,9 @@ function Navbar() {
                                 <li className="nav-item mx-2">
                                     <Link className="btn btn-outline-primary btn-lg" to="/orders">Заказы</Link>
                                 </li>
+                                <li className="nav-item mx-2">
+                                    <Link className="btn btn-outline-primary btn-lg" to="/payments">Платежи</Link>
+                                </li>
                                 {roles.includes('ADMIN') && (
                                     <>
                                         <li className="nav-item mx-2">
@@ -51,6 +54,9 @@ function Navbar() {
                                         <li className="nav-item mx-2">
                                             <Link className="btn btn-primary btn-lg" to="/admin/orders">Админ — Заказы</Link>
                                         </li>
+                                        <li className="nav-item mx-2">
+                                        <Link className="btn btn-primary btn-lg" to="/admin/payments">Админ — Платежи</Link>
+                                    </li>
                                     </>
                                 )}
                             </>
