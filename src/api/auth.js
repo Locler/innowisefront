@@ -1,16 +1,21 @@
 import axios from 'axios';
 
 // Относительный путь через API Gateway в k8s const API_BASE = process.env.REACT_APP_API_GATEWAY_URL || 'http://innowise.local';
-const API_URL = '';
+const API_URL = axios.create({
+    baseURL: process.env.REACT_APP_API_BASE_URL
+});
 
 export const login = (username, password) =>
-    axios.post(`${API_URL}/auth/login`, { username, password });
+    API_URL.post(`/auth/login`, {username, password});
 
 export const register = (userId, username, password, role = 'ROLE_USER') =>
-    axios.post(`${API_URL}/auth/register`, { userId, username, password, role });
+    API_URL.post(`/register`, {
+        credentials: {username, password, role},
+        profile: {userId}
+    });
 
 export const validate = (token) =>
-    axios.get(`${API_URL}/auth/validate`, { params: { token } });
+    API_URL.get(`/auth/validate`, {params: {token}});
 
 export const refresh = (refreshToken) =>
-    axios.post(`${API_URL}/auth/refresh`, null, { params: { refreshToken } });
+    API_URL.post(`/auth/refresh`, null, {params: {refreshToken}});

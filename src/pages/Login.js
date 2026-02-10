@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import AuthService from '../services/AuthService';
 import { useNavigate } from 'react-router-dom';
+import AuthService from '../services/AuthService';
+import axios from 'axios';
 
-function Login() {
+function Login({ setIsLoggedIn }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -13,8 +14,34 @@ function Login() {
         setError('');
 
         try {
-            await AuthService.login(username, password);
-            navigate('/'); // пока редирект на главную
+            const res = await AuthService.login(username, password);
+
+            // Берём токен и роли независимо от структуры ответа
+            const token = res.token || res.accessToken;
+            const roles = res.roles || res.user?.roles || [];
+
+            if (!token) {
+                setError(res.message || 'Неверный логин или пароль');
+                return;
+            }
+
+            // Сохраняем в localStorage
+            localStorage.setItem('accessToken', token);
+            localStorage.setItem('userRoles', roles.join(','));
+
+            // Обновляем axios header
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+            // Обновляем state SPA
+            setIsLoggedIn(true);
+
+            // Редирект в зависимости от роли
+            if (roles.includes('ROLE_ADMIN')) {
+                navigate('/admin/users', { replace: true });
+            } else {
+                navigate('/profile', { replace: true });
+            }
+
         } catch (err) {
             setError(err.response?.data?.message || 'Неверный логин или пароль');
         }
@@ -49,14 +76,13 @@ function Login() {
                         />
                     </div>
 
-                    <button className="btn btn-primary w-100">Войти</button>
+                    <button type="submit" className="btn btn-primary w-100">Войти</button>
                 </form>
 
                 <div className="mt-3 text-center">
                     <small>Нет аккаунта? <a href="/register">Зарегистрируйтесь</a></small>
                 </div>
             </div>
-
         </div>
     );
 }

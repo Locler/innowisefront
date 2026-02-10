@@ -6,29 +6,31 @@ const authHeader = () => ({
     'X-User-Id': localStorage.getItem('userId') || ''
 });
 
-const API_URL = '';
+const API_URL = axios.create({
+    baseURL: process.env.REACT_APP_API_BASE_URL
+});
 
 export const getMyCards = (userId) =>
-    axios.get(`${API_URL}/cards/users/${userId}`, { headers: authHeader() });
+    API_URL.get(`/cards/users/${userId}`, { headers: authHeader() });
 
 export const createCard = (userId, card) =>
-    axios.post(`${API_URL}/cards/user/${userId}`, card, { headers: authHeader() });
+    API_URL.post(`/cards/user/${userId}`, card, { headers: authHeader() });
 
 export const updateCard = (cardId, card) =>
-    axios.put(`${API_URL}/cards/${cardId}`, card, { headers: authHeader() });
+    API_URL.put(`/cards/${cardId}`, card, { headers: authHeader() });
 
 export const deleteCard = (cardId) =>
-    axios.delete(`${API_URL}/cards/${cardId}`, { headers: authHeader() });
+    API_URL.delete(`/cards/${cardId}`, { headers: authHeader() });
 
 export const activateCard = (cardId) =>
-    axios.put(`${API_URL}/cards/${cardId}/activate`, {}, { headers: authHeader() });
+    API_URL.put(`/cards/${cardId}/activate`, {}, { headers: authHeader() });
 
 export const deactivateCard = (cardId) =>
-    axios.put(`${API_URL}/cards/${cardId}/deactivate`, {}, { headers: authHeader() });
+    API_URL.put(`/cards/${cardId}/deactivate`, {}, { headers: authHeader() });
 
 export const getAllCards = (pageable) =>
-    axios.get(`${API_URL}/cards`, { params: pageable, headers: authHeader() });
+    API_URL.get(`/cards`, { params: pageable, headers: authHeader() });
 
 export const getCardById = (cardId) =>
-    axios.get(`${API_URL}/cards/${cardId}`, { headers: authHeader() });
+    API_URL.get(`/cards/${cardId}`, { headers: authHeader() });
 

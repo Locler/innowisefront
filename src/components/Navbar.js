@@ -1,8 +1,17 @@
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
-function Navbar() {
+function Navbar({ isLoggedIn, setIsLoggedIn }) {
     const roles = (localStorage.getItem('userRoles') || '').split(',');
-    const isLoggedIn = !!localStorage.getItem('accessToken');
+
+    const handleLogout = () => {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('userRoles');
+
+        delete axios.defaults.headers.common['Authorization'];
+
+        setIsLoggedIn(false);
+    };
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-white shadow mb-4 py-3">
@@ -25,7 +34,7 @@ function Navbar() {
                     <ul className="navbar-nav align-items-center">
                         {isLoggedIn ? (
                             <>
-                                <li className="nav-item mx-3">
+                                <li className="nav-item mx-2">
                                     <Link className="btn btn-outline-primary btn-lg" to="/profile">Профиль</Link>
                                 </li>
                                 <li className="nav-item mx-2">
@@ -40,7 +49,8 @@ function Navbar() {
                                 <li className="nav-item mx-2">
                                     <Link className="btn btn-outline-primary btn-lg" to="/payments">Платежи</Link>
                                 </li>
-                                {roles.includes('ADMIN') && (
+
+                                {roles.includes('ROLE_ADMIN') && (
                                     <>
                                         <li className="nav-item mx-2">
                                             <Link className="btn btn-primary btn-lg" to="/admin/users">Админ — Пользователи</Link>
@@ -55,17 +65,21 @@ function Navbar() {
                                             <Link className="btn btn-primary btn-lg" to="/admin/orders">Админ — Заказы</Link>
                                         </li>
                                         <li className="nav-item mx-2">
-                                        <Link className="btn btn-primary btn-lg" to="/admin/payments">Админ — Платежи</Link>
-                                    </li>
+                                            <Link className="btn btn-primary btn-lg" to="/admin/payments">Админ — Платежи</Link>
+                                        </li>
                                     </>
                                 )}
+
+                                <li className="nav-item mx-2">
+                                    <button className="btn btn-danger btn-lg" onClick={handleLogout}>Выйти</button>
+                                </li>
                             </>
                         ) : (
                             <>
-                                <li className="nav-item mx-3">
+                                <li className="nav-item mx-2">
                                     <Link className="btn btn-outline-success btn-lg" to="/login">Вход</Link>
                                 </li>
-                                <li className="nav-item mx-3">
+                                <li className="nav-item mx-2">
                                     <Link className="btn btn-outline-success btn-lg" to="/register">Регистрация</Link>
                                 </li>
                             </>

@@ -7,28 +7,30 @@ const authHeader = () => ({
     'X-User-Id': localStorage.getItem('userId') || ''
 });
 
-const API_URL = '';
+const API_URL = axios.create({
+    baseURL: process.env.REACT_APP_API_BASE_URL
+});
 
 export const getAllUsers = (params) =>
-    axios.get(`${API_URL}/users`, { params, headers: authHeader() });
+    API_URL.get(`/users`, { params, headers: authHeader() });
 
 export const getUserById = (id) =>
-    axios.get(`${API_URL}/users/${id}`, { headers: authHeader() });
+    API_URL.get(`/users/${id}`, { headers: authHeader() });
 
 export const getUserByEmail = (email) =>
-    axios.get(`${API_URL}/users/by-email`, { params: { email }, headers: authHeader() });
+    API_URL.get(`/users/by-email`, { params: { email }, headers: authHeader() });
 
 export const createUser = (userDto) =>
-    axios.post(`${API_URL}/users`, userDto, { headers: authHeader() });
+    API_URL.post(`/users`, userDto, { headers: authHeader() });
 
 export const updateUser = (id, userDto) =>
-    axios.put(`${API_URL}/users/${id}`, userDto, { headers: authHeader() });
+    API_URL.put(`/users/${id}`, userDto, { headers: authHeader() });
 
 export const deleteUser = (id) =>
-    axios.delete(`${API_URL}/users/${id}`, { headers: authHeader() });
+    API_URL.delete(`/users/${id}`, { headers: authHeader() });
 
 export const activateUser = (id) =>
-    axios.put(`${API_URL}/users/${id}/activate`, {}, { headers: authHeader() });
+    API_URL.put(`/users/${id}/activate`, {}, { headers: authHeader() });
 
 export const deactivateUser = (id) =>
-    axios.put(`${API_URL}/users/${id}/deactivate`, {}, { headers: authHeader() });
+    API_URL.put(`/users/${id}/deactivate`, {}, { headers: authHeader() });
