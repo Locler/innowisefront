@@ -11,6 +11,7 @@ import Orders from './pages/user/Orders';
 import Items from './pages/user/Items';
 import Payments from './pages/user/Payments';
 
+import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminCards from './pages/admin/AdminCards';
 import AdminItems from './pages/admin/AdminItems';
@@ -23,6 +24,8 @@ import PrivateRoute from './components/PrivateRoute';
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('accessToken'));
+    const role = localStorage.getItem('userRole'); // одиночная роль: ROLE_ADMIN или ROLE_USER
+    const isAdmin = role === 'ROLE_ADMIN';
 
     useEffect(() => {
         const token = localStorage.getItem('accessToken');
@@ -37,13 +40,12 @@ function App() {
 
             <div className="container">
                 <Routes>
-
-                    {/* auth */}
+                    {/* Auth */}
                     <Route
                         path="/login"
                         element={
                             isLoggedIn
-                                ? <Navigate to="/profile" replace />
+                                ? <Navigate to={isAdmin ? "/admin" : "/profile"} replace />
                                 : <Login setIsLoggedIn={setIsLoggedIn} />
                         }
                     />
@@ -51,12 +53,12 @@ function App() {
                         path="/register"
                         element={
                             isLoggedIn
-                                ? <Navigate to="/profile" replace />
+                                ? <Navigate to={isAdmin ? "/admin" : "/profile"} replace />
                                 : <Register />
                         }
                     />
 
-                    {/* user */}
+                    {/* User routes */}
                     <Route path="/profile" element={<PrivateRoute isLoggedIn={isLoggedIn}><Users /></PrivateRoute>} />
                     <Route path="/cards" element={<PrivateRoute isLoggedIn={isLoggedIn}><Cards /></PrivateRoute>} />
                     <Route path="/items" element={<PrivateRoute isLoggedIn={isLoggedIn}><Items /></PrivateRoute>} />
@@ -64,7 +66,8 @@ function App() {
                     <Route path="/orders" element={<PrivateRoute isLoggedIn={isLoggedIn}><Orders /></PrivateRoute>} />
                     <Route path="/payments" element={<PrivateRoute isLoggedIn={isLoggedIn}><Payments /></PrivateRoute>} />
 
-                    {/* admin */}
+                    {/* Admin routes */}
+                    <Route path="/admin" element={<PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}><AdminDashboard /></PrivateRoute>} />
                     <Route path="/admin/users" element={<PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}><AdminUsers /></PrivateRoute>} />
                     <Route path="/admin/cards" element={<PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}><AdminCards /></PrivateRoute>} />
                     <Route path="/admin/items" element={<PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}><AdminItems /></PrivateRoute>} />
@@ -72,14 +75,10 @@ function App() {
                     <Route path="/admin/orders" element={<PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}><AdminOrders /></PrivateRoute>} />
                     <Route path="/admin/payments" element={<PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}><AdminPayments /></PrivateRoute>} />
 
-                    {/* fallback */}
+                    {/* Fallback */}
                     <Route
                         path="*"
-                        element={
-                            isLoggedIn
-                                ? <Navigate to="/profile" replace />
-                                : <Navigate to="/login" replace />
-                        }
+                        element={isLoggedIn ? <Navigate to={isAdmin ? "/admin" : "/profile"} replace /> : <Navigate to="/login" replace />}
                     />
                 </Routes>
             </div>

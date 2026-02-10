@@ -1,16 +1,16 @@
 import { Navigate } from 'react-router-dom';
 
-function PrivateRoute({ children, roles = [], isLoggedIn }) {
-    const userRoles = (localStorage.getItem('userRoles') || '')
-        .split(',')
-        .map(r => r.trim());
+function PrivateRoute({ isLoggedIn, roles = [], userRole, children }) {
+    if (isLoggedIn === null) {
+        return <div className="text-center mt-5">Загрузка профиля...</div>;
+    }
 
     if (!isLoggedIn) {
         return <Navigate to="/login" replace />;
     }
 
-    if (roles.length > 0 && !roles.some(role => userRoles.includes(role))) {
-        return <Navigate to="/profile" replace />;
+    if (roles.length && !roles.includes(userRole)) {
+        return <Navigate to="/" replace />;
     }
 
     return children;
