@@ -1,7 +1,6 @@
 import * as api from '../api/orders';
 
 class OrderService {
-
     async getOrder(id) {
         try {
             const res = await api.getOrderById(id);

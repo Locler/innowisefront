@@ -15,20 +15,17 @@ function OrderItems() {
     const [form, setForm] = useState({ orderId: '', itemId: '', quantity: 1 });
     const [editingId, setEditingId] = useState(null);
 
-    useEffect(() => {
-        loadData();
-    }, []);
+    useEffect(() => { loadData(); }, []);
 
     const loadData = async () => {
         setLoading(true);
+        setError(null);
         try {
-            // USER видит только свои заказы
             const ordersRes = await OrderService.getAllOrders({ page: 0, size: 100 });
             const myOrders = ordersRes.content.filter(o => o.user?.id === userId);
 
             const itemsRes = await ItemService.getAllItems({ page: 0, size: 100 });
 
-            // OrderItems только для своих заказов
             const orderItemsRes = await OrderItemService.getAllOrderItems({ page: 0, size: 100 });
             const myOrderItems = orderItemsRes.content.filter(oi => myOrders.some(o => o.id === oi.orderId));
 
@@ -51,12 +48,17 @@ function OrderItems() {
         e.preventDefault();
         setError(null);
         try {
+            if (!orders.some(o => o.id === Number(form.orderId))) {
+                throw new Error('Нельзя создавать OrderItem для чужого заказа');
+            }
+
             if (editingId) {
                 await OrderItemService.updateOrderItem(editingId, form);
                 setEditingId(null);
             } else {
                 await OrderItemService.createOrderItem(form);
             }
+
             setForm({ orderId: '', itemId: '', quantity: 1 });
             loadData();
         } catch (e) {
@@ -65,11 +67,20 @@ function OrderItems() {
     };
 
     const handleEdit = item => {
+        if (!orders.some(o => o.id === item.orderId)) {
+            setError('Нельзя редактировать чужой OrderItem');
+            return;
+        }
         setForm({ orderId: item.orderId, itemId: item.itemId, quantity: item.quantity });
         setEditingId(item.id);
     };
 
     const handleDelete = async id => {
+        const oi = orderItems.find(oi => oi.id === id);
+        if (!orders.some(o => o.id === oi.orderId)) {
+            setError('Нельзя удалить чужой OrderItem');
+            return;
+        }
         if (!window.confirm('Вы уверены, что хотите удалить этот OrderItem?')) return;
         setError(null);
         try {
@@ -132,9 +143,7 @@ function OrderItems() {
                         />
                     </div>
                 </div>
-                <button type="submit" className="btn btn-primary">
-                    {editingId ? 'Обновить' : 'Создать'}
-                </button>
+                <button type="submit" className="btn btn-primary">{editingId ? 'Обновить' : 'Создать'}</button>
             </form>
 
             <table className="table table-striped">

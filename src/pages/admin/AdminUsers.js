@@ -8,22 +8,25 @@ function AdminUsers() {
     const [editingId, setEditingId] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
-        const roles = localStorage.getItem('userRoles');
-        if (!roles?.includes('ADMIN')) {
-            alert('Нет доступа!');
-            return;
-        }
+        const admin = UserService.isAdmin();
+        setIsAdmin(admin);
+        if (!admin) return;
         loadUsers();
     }, []);
 
     const loadUsers = async () => {
+        setLoading(true);
+        setError(null);
         try {
             const res = await UserService.getAllUsers();
-            setUsers(res.data.content || []);
-        } catch {
-            setError('Не удалось загрузить пользователей');
+            setUsers(res.data?.content || []);
+        } catch (e) {
+            setError(e.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -43,7 +46,7 @@ function AdminUsers() {
             setEditingId(null);
             await loadUsers();
         } catch (e) {
-            setError(e.response?.data?.message || 'Ошибка запроса');
+            setError(e.message);
         } finally {
             setLoading(false);
         }
@@ -57,15 +60,31 @@ function AdminUsers() {
 
     const handleDelete = async (id) => {
         if (!window.confirm('Удалить пользователя?')) return;
-        await UserService.deleteUser(id);
-        loadUsers();
+        setLoading(true);
+        try {
+            await UserService.deleteUser(id);
+            await loadUsers();
+        } catch (e) {
+            setError(e.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const toggleActive = async (user) => {
-        if (user.active) await UserService.deactivateUser(user.id);
-        else await UserService.activateUser(user.id);
-        loadUsers();
+        setLoading(true);
+        try {
+            if (user.active) await UserService.deactivateUser(user.id);
+            else await UserService.activateUser(user.id);
+            await loadUsers();
+        } catch (e) {
+            setError(e.message);
+        } finally {
+            setLoading(false);
+        }
     };
+
+    if (!isAdmin) return <div className="alert alert-warning mt-4">Доступ только для администратора</div>;
 
     return (
         <div className="container mt-4">
@@ -80,21 +99,27 @@ function AdminUsers() {
                 <button className="btn btn-primary" disabled={loading}>{loading ? 'Сохранение...' : 'Сохранить'}</button>
             </form>
 
-            <ul className="list-group">
-                {users.map(user => (
-                    <li key={user.id} className="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>{user.name} {user.surname}</strong> — {user.email} <br />
-                            Активен: {user.active ? 'Да' : 'Нет'}
-                        </div>
-                        <div>
-                            <button className="btn btn-sm btn-secondary me-2" onClick={() => startEdit(user)}>Редактировать</button>
-                            <button className="btn btn-sm btn-warning me-2" onClick={() => toggleActive(user)}>{user.active ? 'Деактивировать' : 'Активировать'}</button>
-                            <button className="btn btn-sm btn-danger" onClick={() => handleDelete(user.id)}>Удалить</button>
-                        </div>
-                    </li>
-                ))}
-            </ul>
+            {loading && !users.length ? (
+                <div>Загрузка пользователей...</div>
+            ) : (
+                <ul className="list-group">
+                    {users.map(user => (
+                        <li key={user.id} className="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{user.name} {user.surname}</strong> — {user.email} <br />
+                                Активен: {user.active ? 'Да' : 'Нет'}
+                            </div>
+                            <div>
+                                <button className="btn btn-sm btn-secondary me-2" onClick={() => startEdit(user)}>Редактировать</button>
+                                <button className="btn btn-sm btn-warning me-2" onClick={() => toggleActive(user)}>
+                                    {user.active ? 'Деактивировать' : 'Активировать'}
+                                </button>
+                                <button className="btn btn-sm btn-danger" onClick={() => handleDelete(user.id)}>Удалить</button>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
     );
 }

@@ -4,15 +4,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Cards() {
     const [cards, setCards] = useState([]);
-    const [form, setForm] = useState({
-        number: '',
-        holder: '',
-        expirationDate: ''
-    });
+    const [form, setForm] = useState({ number: '', holder: '', expirationDate: '' });
     const [editingId, setEditingId] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-
     const userId = localStorage.getItem('userId');
 
     useEffect(() => {
@@ -20,11 +15,15 @@ function Cards() {
     }, []);
 
     const loadCards = async () => {
+        setLoading(true);
+        setError(null);
         try {
             const res = await CardService.getCardsByUserId(userId);
-            setCards(res.data);
-        } catch {
-            setError('Не удалось загрузить карты');
+            setCards(res.data || []);
+        } catch (e) {
+            setError(e.response?.data?.message || e.message || 'Не удалось загрузить карты');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -44,11 +43,8 @@ function Cards() {
             setEditingId(null);
             await loadCards();
         } catch (e) {
-            if (e.response) {
-                if (e.response.data?.errors) setError(e.response.data.errors);
-                else if (e.response.data?.message) setError(e.response.data.message);
-                else setError('Ошибка запроса');
-            } else setError('Сервер недоступен');
+            if (e.response?.data?.errors) setError(e.response.data.errors);
+            else setError(e.response?.data?.message || e.message || 'Ошибка запроса');
         } finally {
             setLoading(false);
         }
@@ -56,11 +52,7 @@ function Cards() {
 
     const startEdit = (card) => {
         setEditingId(card.id);
-        setForm({
-            number: card.number,
-            holder: card.holder,
-            expirationDate: card.expirationDate
-        });
+        setForm({ number: card.number, holder: card.holder, expirationDate: card.expirationDate });
         setError(null);
     };
 
@@ -85,6 +77,8 @@ function Cards() {
                 <button className="btn btn-primary" disabled={loading}>{loading ? 'Сохранение...' : 'Сохранить'}</button>
             </form>
 
+            {loading && !cards.length ? <div>Загрузка карт...</div> : null}
+
             <ul className="list-group">
                 {cards.map(card => (
                     <li key={card.id} className="list-group-item d-flex justify-content-between align-items-center">
@@ -92,7 +86,9 @@ function Cards() {
                             <strong>{card.number}</strong> — {card.holder} <br />
                             до {card.expirationDate}
                         </div>
-                        <button className="btn btn-sm btn-outline-secondary" onClick={() => startEdit(card)}>Редактировать</button>
+                        <button className="btn btn-sm btn-outline-secondary" onClick={() => startEdit(card)} disabled={loading}>
+                            Редактировать
+                        </button>
                     </li>
                 ))}
             </ul>

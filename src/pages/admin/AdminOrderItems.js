@@ -93,7 +93,9 @@ function AdminOrderItems() {
                         >
                             <option value="">Выберите заказ</option>
                             {orders.map(o => (
-                                <option key={o.id} value={o.id}>#{o.id} - {o.status}</option>
+                                <option key={o.order?.id} value={o.order?.id}>
+                                    #{o.order?.id} - {o.order?.status}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -108,7 +110,9 @@ function AdminOrderItems() {
                         >
                             <option value="">Выберите товар</option>
                             {items.map(i => (
-                                <option key={i.id} value={i.id}>{i.name} (${i.price})</option>
+                                <option key={i.id} value={i.id}>
+                                    {i.name} (${i.price})
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -144,7 +148,7 @@ function AdminOrderItems() {
                 {orderItems.map(oi => (
                     <tr key={oi.id}>
                         <td>{oi.orderId}</td>
-                        <td>{oi.user?.name || oi.userId || '—'}</td>
+                        <td>{oi.user?.name || '—'}</td>
                         <td>{items.find(i => i.id === oi.itemId)?.name || oi.itemId}</td>
                         <td>{oi.quantity}</td>
                         <td>

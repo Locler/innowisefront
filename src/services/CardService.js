@@ -1,18 +1,16 @@
 import * as api from '../api/cards';
 
 class CardService {
-    constructor() {
-        this.roles = (localStorage.getItem('userRoles') || '').split(',');
-    }
-
+    // Динамическая проверка ролей
     isAdmin() {
-        return this.roles.includes('ADMIN');
+        const roles = (localStorage.getItem('userRoles') || '').split(',');
+        return roles.includes('ADMIN') || roles.includes('ROLE_ADMIN');
     }
 
     async getCardsByUserId(userId) {
         try {
             const res = await api.getMyCards(userId);
-            return res.data;
+            return res;
         } catch (err) {
             throw this.parseError(err);
         }
@@ -21,7 +19,7 @@ class CardService {
     async getCardById(cardId) {
         try {
             const res = await api.getCardById(cardId);
-            return res.data;
+            return res;
         } catch (err) {
             throw this.parseError(err);
         }
@@ -30,7 +28,7 @@ class CardService {
     async createCard(userId, card) {
         try {
             const res = await api.createCard(userId, card);
-            return res.data;
+            return res;
         } catch (err) {
             throw this.parseError(err);
         }
@@ -39,7 +37,7 @@ class CardService {
     async updateCard(cardId, card) {
         try {
             const res = await api.updateCard(cardId, card);
-            return res.data;
+            return res;
         } catch (err) {
             throw this.parseError(err);
         }
@@ -76,7 +74,7 @@ class CardService {
         if (!this.isAdmin()) throw new Error('Доступ только для администратора');
         try {
             const res = await api.getAllCards(pageable);
-            return res.data;
+            return res;
         } catch (err) {
             throw this.parseError(err);
         }

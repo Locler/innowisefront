@@ -4,24 +4,27 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function AdminCards() {
     const [cards, setCards] = useState([]);
-    const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
-        const roles = localStorage.getItem('userRoles');
-        if (!roles?.includes('ADMIN')) {
-            alert('Нет доступа!');
-            return;
-        }
+        const admin = CardService.isAdmin();
+        setIsAdmin(admin);
+        if (!admin) return;
         loadAllCards();
     }, []);
 
     const loadAllCards = async () => {
+        setLoading(true);
+        setError(null);
         try {
             const res = await CardService.getAllCards();
-            setCards(res.data.content || []);
-        } catch {
-            setError('Не удалось загрузить карты');
+            setCards(res.data?.content || []);
+        } catch (e) {
+            setError(e.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -31,8 +34,8 @@ function AdminCards() {
             if (card.active) await CardService.deactivateCard(card.id);
             else await CardService.activateCard(card.id);
             await loadAllCards();
-        } catch {
-            setError('Ошибка при смене статуса карты');
+        } catch (e) {
+            setError(e.message);
         } finally {
             setLoading(false);
         }
@@ -44,18 +47,21 @@ function AdminCards() {
         try {
             await CardService.deleteCard(id);
             await loadAllCards();
-        } catch {
-            setError('Ошибка при удалении карты');
+        } catch (e) {
+            setError(e.message);
         } finally {
             setLoading(false);
         }
     };
 
-    if (error) return <div className="alert alert-danger">{error}</div>;
+    if (!isAdmin) return <div className="alert alert-warning mt-4">Доступ только для администратора</div>;
 
     return (
         <div className="container mt-4">
             <h2>Админ — Все карты</h2>
+
+            {error && <div className="alert alert-danger">{error}</div>}
+            {loading && !cards.length && <div>Загрузка карт...</div>}
 
             <ul className="list-group">
                 {cards.map(card => (

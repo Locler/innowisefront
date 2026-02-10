@@ -2,11 +2,16 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 function Navbar({ isLoggedIn, setIsLoggedIn }) {
-    const roles = (localStorage.getItem('userRoles') || '').split(',');
+    const roles = (localStorage.getItem('userRoles') || '')
+        .split(',')
+        .map(r => r.trim());
+
+    const isAdmin = roles.includes('ROLE_ADMIN');
 
     const handleLogout = () => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('userRoles');
+        localStorage.removeItem('userId');
 
         delete axios.defaults.headers.common['Authorization'];
 
@@ -23,9 +28,6 @@ function Navbar({ isLoggedIn, setIsLoggedIn }) {
                     type="button"
                     data-bs-toggle="collapse"
                     data-bs-target="#navbarNav"
-                    aria-controls="navbarNav"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation"
                 >
                     <span className="navbar-toggler-icon"></span>
                 </button>
@@ -50,7 +52,7 @@ function Navbar({ isLoggedIn, setIsLoggedIn }) {
                                     <Link className="btn btn-outline-primary btn-lg" to="/payments">Платежи</Link>
                                 </li>
 
-                                {roles.includes('ROLE_ADMIN') && (
+                                {isAdmin && (
                                     <>
                                         <li className="nav-item mx-2">
                                             <Link className="btn btn-primary btn-lg" to="/admin/users">Админ — Пользователи</Link>
@@ -71,7 +73,9 @@ function Navbar({ isLoggedIn, setIsLoggedIn }) {
                                 )}
 
                                 <li className="nav-item mx-2">
-                                    <button className="btn btn-danger btn-lg" onClick={handleLogout}>Выйти</button>
+                                    <button className="btn btn-danger btn-lg" onClick={handleLogout}>
+                                        Выйти
+                                    </button>
                                 </li>
                             </>
                         ) : (

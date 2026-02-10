@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const authHeader = () => ({
-    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+    Authorization: `Bearer ${localStorage.getItem('accessToken') || ''}`,
     'X-User-Roles': localStorage.getItem('userRoles') || '',
     'X-User-Id': localStorage.getItem('userId') || ''
 });
@@ -12,7 +12,7 @@ const API_URL = axios.create({
 
 // POST /payments
 export const createPayment = (dto) =>
-    API_URL.post(`/payments`, dto, { headers: authHeader() });
+    API_URL.post('/payments', dto, { headers: { ...authHeader(), 'Content-Type': 'application/json' } });
 
 // GET /payments/{id}
 export const getPaymentById = (id) =>

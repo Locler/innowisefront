@@ -1,14 +1,29 @@
 import * as api from '../api/auth';
+import axios from 'axios';
 
 class AuthService {
+    // Логин
     async login(username, password) {
         const res = await api.login(username, password);
+
+        // Сохраняем токены
         localStorage.setItem('accessToken', res.data.accessToken);
         localStorage.setItem('refreshToken', res.data.refreshToken);
 
+        // Получаем userId и роль через validate
         const validation = await api.validate(res.data.accessToken);
         localStorage.setItem('userId', validation.data.userId);
-        localStorage.setItem('role', validation.data.role); // сохраняем роль
+        localStorage.setItem('role', validation.data.role);
+
+        // Обновляем заголовок axios
+        axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.accessToken}`;
+
+        return validation.data;
+    }
+
+    // Регистрация
+    async register(body) {
+        await api.register(body);
     }
 
     getUserId() {
@@ -17,10 +32,6 @@ class AuthService {
 
     getRole() {
         return localStorage.getItem('role');
-    }
-
-    async register(userId, username, password, role = 'ROLE_USER') {
-        await api.register(userId, username, password, role);
     }
 
     getAccessToken() {
@@ -36,6 +47,7 @@ class AuthService {
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('userId');
         localStorage.removeItem('role');
+        delete axios.defaults.headers.common['Authorization'];
     }
 }
 

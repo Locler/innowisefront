@@ -1,4 +1,4 @@
-import * as api from '../api/oderItems';
+import * as api from "../api/oderItems"
 
 class OrderItemService {
     async getOrderItem(id) {
@@ -46,4 +46,4 @@ class OrderItemService {
     }
 }
 
-export default new OrderItemService()
+export default new OrderItemService();

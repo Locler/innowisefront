@@ -23,7 +23,7 @@ class PaymentService {
     async getPaymentsByUser(userId) {
         try {
             const res = await api.getPaymentsByUser(userId);
-            return res.data;
+            return res.data || [];
         } catch (e) {
             throw new Error(e.response?.data?.message || 'Ошибка при получении платежей пользователя');
         }
@@ -32,7 +32,7 @@ class PaymentService {
     async getPaymentsByOrder(orderId) {
         try {
             const res = await api.getPaymentsByOrder(orderId);
-            return res.data;
+            return res.data || [];
         } catch (e) {
             throw new Error(e.response?.data?.message || 'Ошибка при получении платежей по заказу');
         }
@@ -40,7 +40,7 @@ class PaymentService {
 
     async updateStatus(id, status) {
         try {
-            const res = await api.updatePaymentStatus(id, status);
+            const res = await api.updatePaymentStatus(id, status.toUpperCase());
             return res.data;
         } catch (e) {
             throw new Error(e.response?.data?.message || 'Ошибка при обновлении статуса платежа');

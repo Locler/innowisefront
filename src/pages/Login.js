@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthService from '../services/AuthService';
-import axios from 'axios';
 
 function Login({ setIsLoggedIn }) {
     const [username, setUsername] = useState('');
@@ -14,36 +13,18 @@ function Login({ setIsLoggedIn }) {
         setError('');
 
         try {
-            const res = await AuthService.login(username, password);
-
-            // Берём токен и роли независимо от структуры ответа
-            const token = res.token || res.accessToken;
-            const roles = res.roles || res.user?.roles || [];
-
-            if (!token) {
-                setError(res.message || 'Неверный логин или пароль');
-                return;
-            }
-
-            // Сохраняем в localStorage
-            localStorage.setItem('accessToken', token);
-            localStorage.setItem('userRoles', roles.join(','));
-
-            // Обновляем axios header
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-            // Обновляем state SPA
+            const userData = await AuthService.login(username, password);
             setIsLoggedIn(true);
 
-            // Редирект в зависимости от роли
-            if (roles.includes('ROLE_ADMIN')) {
+            // Редирект по роли
+            if (userData.role === 'ROLE_ADMIN') {
                 navigate('/admin/users', { replace: true });
             } else {
                 navigate('/profile', { replace: true });
             }
 
         } catch (err) {
-            setError(err.response?.data?.message || 'Неверный логин или пароль');
+            setError(err.response?.data?.error?.message || 'Неверный логин или пароль');
         }
     };
 
@@ -57,23 +38,12 @@ function Login({ setIsLoggedIn }) {
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
                         <label className="form-label">Username</label>
-                        <input
-                            className="form-control"
-                            placeholder="Введите логин"
-                            value={username}
-                            onChange={e => setUsername(e.target.value)}
-                        />
+                        <input className="form-control" value={username} onChange={e => setUsername(e.target.value)} />
                     </div>
 
                     <div className="mb-3">
                         <label className="form-label">Password</label>
-                        <input
-                            type="password"
-                            className="form-control"
-                            placeholder="Введите пароль"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
-                        />
+                        <input type="password" className="form-control" value={password} onChange={e => setPassword(e.target.value)} />
                     </div>
 
                     <button type="submit" className="btn btn-primary w-100">Войти</button>

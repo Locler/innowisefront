@@ -8,12 +8,15 @@ function AdminPayments() {
   const [error, setError] = useState(null);
 
   const loadPaymentsByOrder = async () => {
-    if (!orderId) return;
+    if (!orderId) {
+      alert('Введите Order ID');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const res = await PaymentService.getPaymentsByOrder(orderId);
-      setPayments(res);
+      setPayments(res || []);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -23,8 +26,11 @@ function AdminPayments() {
 
   const updateStatus = async (paymentId, status) => {
     try {
-      await PaymentService.updateStatus(paymentId, status);
-      await loadPaymentsByOrder();
+      const updated = await PaymentService.updateStatus(paymentId, status.toUpperCase());
+      // Локальное обновление списка
+      setPayments(prev =>
+          prev.map(p => (p.id === updated.id ? updated : p))
+      );
     } catch (e) {
       alert(e.message);
     }
@@ -66,9 +72,9 @@ function AdminPayments() {
               <tr>
                 <th>ID</th>
                 <th>Order</th>
-                <th>User</th>
-                <th>Amount</th>
-                <th>Status</th>
+                <th>User ID</th>
+                <th>Сумма</th>
+                <th>Статус</th>
                 <th>Действия</th>
               </tr>
               </thead>
@@ -78,7 +84,7 @@ function AdminPayments() {
                     <td>{p.id}</td>
                     <td>{p.orderId}</td>
                     <td>{p.userId}</td>
-                    <td>{p.paymentAmount}</td>
+                    <td>{p.paymentAmount?.toFixed(2) || 0} ₽</td>
                     <td>{p.status}</td>
                     <td className="d-flex gap-1">
                       <button
@@ -104,6 +110,10 @@ function AdminPayments() {
               ))}
               </tbody>
             </table>
+        )}
+
+        {!loading && payments.length === 0 && !error && (
+            <div>Платежи не найдены</div>
         )}
       </div>
   );

@@ -49,7 +49,9 @@ function AdminOrders() {
                             <td>{owu.order?.totalPrice?.toFixed(2) || 0} ₽</td>
                             <td>
                                 {owu.order?.orderItems?.length
-                                    ? owu.order.orderItems.map(oi => `Item ${oi.itemId} x${oi.quantity}`).join(', ')
+                                    ? owu.order.orderItems
+                                        .map(oi => `Item ${oi.itemId} x${oi.quantity}`)
+                                        .join(', ')
                                     : '—'}
                             </td>
                         </tr>

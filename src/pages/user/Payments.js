@@ -45,7 +45,7 @@ function Payments() {
                         <tr key={p.id}>
                             <td>{p.id}</td>
                             <td>{p.orderId}</td>
-                            <td>{p.paymentAmount}</td>
+                            <td>{p.paymentAmount?.toFixed(2) || 0} ₽</td>
                             <td>{p.status}</td>
                         </tr>
                     ))}

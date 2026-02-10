@@ -9,18 +9,21 @@ import Users from './pages/user/Users';
 import OrderItems from './pages/user/OrderItems';
 import Orders from './pages/user/Orders';
 import Items from './pages/user/Items';
+import Payments from './pages/user/Payments';
+
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminCards from './pages/admin/AdminCards';
 import AdminItems from './pages/admin/AdminItems';
 import AdminOrderItems from './pages/admin/AdminOrderItems';
 import AdminOrders from './pages/admin/AdminOrders';
+import AdminPayments from './pages/admin/AdminPayments';
+
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('accessToken'));
 
-    // Если токен есть в localStorage при монтировании — ставим axios header
     useEffect(() => {
         const token = localStorage.getItem('accessToken');
         if (token) {
@@ -34,7 +37,8 @@ function App() {
 
             <div className="container">
                 <Routes>
-                    {/* страницы входа/регистрации */}
+
+                    {/* auth */}
                     <Route
                         path="/login"
                         element={
@@ -52,89 +56,21 @@ function App() {
                         }
                     />
 
-                    {/* обычный пользователь */}
-                    <Route
-                        path="/profile"
-                        element={
-                            <PrivateRoute isLoggedIn={isLoggedIn}>
-                                <Users />
-                            </PrivateRoute>
-                        }
-                    />
-                    <Route
-                        path="/cards"
-                        element={
-                            <PrivateRoute isLoggedIn={isLoggedIn}>
-                                <Cards />
-                            </PrivateRoute>
-                        }
-                    />
-                    <Route
-                        path="/items"
-                        element={
-                            <PrivateRoute isLoggedIn={isLoggedIn}>
-                                <Items />
-                            </PrivateRoute>
-                        }
-                    />
-                    <Route
-                        path="/order-items"
-                        element={
-                            <PrivateRoute isLoggedIn={isLoggedIn}>
-                                <OrderItems />
-                            </PrivateRoute>
-                        }
-                    />
-                    <Route
-                        path="/orders"
-                        element={
-                            <PrivateRoute isLoggedIn={isLoggedIn}>
-                                <Orders />
-                            </PrivateRoute>
-                        }
-                    />
+                    {/* user */}
+                    <Route path="/profile" element={<PrivateRoute isLoggedIn={isLoggedIn}><Users /></PrivateRoute>} />
+                    <Route path="/cards" element={<PrivateRoute isLoggedIn={isLoggedIn}><Cards /></PrivateRoute>} />
+                    <Route path="/items" element={<PrivateRoute isLoggedIn={isLoggedIn}><Items /></PrivateRoute>} />
+                    <Route path="/order-items" element={<PrivateRoute isLoggedIn={isLoggedIn}><OrderItems /></PrivateRoute>} />
+                    <Route path="/orders" element={<PrivateRoute isLoggedIn={isLoggedIn}><Orders /></PrivateRoute>} />
+                    <Route path="/payments" element={<PrivateRoute isLoggedIn={isLoggedIn}><Payments /></PrivateRoute>} />
 
-                    {/* админ */}
-                    <Route
-                        path="/admin/users"
-                        element={
-                            <PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}>
-                                <AdminUsers />
-                            </PrivateRoute>
-                        }
-                    />
-                    <Route
-                        path="/admin/cards"
-                        element={
-                            <PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}>
-                                <AdminCards />
-                            </PrivateRoute>
-                        }
-                    />
-                    <Route
-                        path="/admin/items"
-                        element={
-                            <PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}>
-                                <AdminItems />
-                            </PrivateRoute>
-                        }
-                    />
-                    <Route
-                        path="/admin/order-items"
-                        element={
-                            <PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}>
-                                <AdminOrderItems />
-                            </PrivateRoute>
-                        }
-                    />
-                    <Route
-                        path="/admin/orders"
-                        element={
-                            <PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}>
-                                <AdminOrders />
-                            </PrivateRoute>
-                        }
-                    />
+                    {/* admin */}
+                    <Route path="/admin/users" element={<PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}><AdminUsers /></PrivateRoute>} />
+                    <Route path="/admin/cards" element={<PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}><AdminCards /></PrivateRoute>} />
+                    <Route path="/admin/items" element={<PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}><AdminItems /></PrivateRoute>} />
+                    <Route path="/admin/order-items" element={<PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}><AdminOrderItems /></PrivateRoute>} />
+                    <Route path="/admin/orders" element={<PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}><AdminOrders /></PrivateRoute>} />
+                    <Route path="/admin/payments" element={<PrivateRoute isLoggedIn={isLoggedIn} roles={['ROLE_ADMIN']}><AdminPayments /></PrivateRoute>} />
 
                     {/* fallback */}
                     <Route

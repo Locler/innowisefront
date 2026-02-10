@@ -21,7 +21,7 @@ function Register() {
                 credentials: {
                     username,
                     password,
-                    role: 'ROLE_USER' // можно изменить на ROLE_ADMIN при необходимости
+                    role: 'ROLE_USER'
                 },
                 profile: {
                     name,
@@ -48,64 +48,32 @@ function Register() {
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
                         <label className="form-label">Username</label>
-                        <input
-                            className="form-control"
-                            placeholder="Введите логин"
-                            value={username}
-                            onChange={e => setUsername(e.target.value)}
-                        />
+                        <input className="form-control" value={username} onChange={e => setUsername(e.target.value)} />
                     </div>
 
                     <div className="mb-3">
                         <label className="form-label">Password</label>
-                        <input
-                            type="password"
-                            className="form-control"
-                            placeholder="Введите пароль"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
-                        />
+                        <input type="password" className="form-control" value={password} onChange={e => setPassword(e.target.value)} />
                     </div>
 
                     <div className="mb-3">
                         <label className="form-label">Имя</label>
-                        <input
-                            className="form-control"
-                            placeholder="Введите имя"
-                            value={name}
-                            onChange={e => setName(e.target.value)}
-                        />
+                        <input className="form-control" value={name} onChange={e => setName(e.target.value)} />
                     </div>
 
                     <div className="mb-3">
                         <label className="form-label">Фамилия</label>
-                        <input
-                            className="form-control"
-                            placeholder="Введите фамилию"
-                            value={surname}
-                            onChange={e => setSurname(e.target.value)}
-                        />
+                        <input className="form-control" value={surname} onChange={e => setSurname(e.target.value)} />
                     </div>
 
                     <div className="mb-3">
                         <label className="form-label">Email</label>
-                        <input
-                            type="email"
-                            className="form-control"
-                            placeholder="Введите email"
-                            value={email}
-                            onChange={e => setEmail(e.target.value)}
-                        />
+                        <input type="email" className="form-control" value={email} onChange={e => setEmail(e.target.value)} />
                     </div>
 
                     <div className="mb-3">
                         <label className="form-label">Дата рождения</label>
-                        <input
-                            type="date"
-                            className="form-control"
-                            value={birthDate}
-                            onChange={e => setBirthDate(e.target.value)}
-                        />
+                        <input type="date" className="form-control" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
                     </div>
 
                     <button className="btn btn-primary w-100">Зарегистрироваться</button>

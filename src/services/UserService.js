@@ -1,19 +1,17 @@
 import * as api from '../api/users';
 
 class UserService {
-    constructor() {
-        this.roles = (localStorage.getItem('userRoles') || '').split(',');
-    }
-
+    // Динамическая проверка ролей
     isAdmin() {
-        return this.roles.includes('ADMIN');
+        const roles = (localStorage.getItem('userRoles') || '').split(',');
+        return roles.includes('ADMIN') || roles.includes('ROLE_ADMIN');
     }
 
     async getAllUsers(params) {
         if (!this.isAdmin()) throw new Error('Доступ только для администратора');
         try {
             const res = await api.getAllUsers(params);
-            return res.data;
+            return res;
         } catch (err) {
             throw this.parseError(err);
         }
@@ -22,17 +20,7 @@ class UserService {
     async getUserById(id) {
         try {
             const res = await api.getUserById(id);
-            return res.data;
-        } catch (err) {
-            throw this.parseError(err);
-        }
-    }
-
-    async getUserByEmail(email) {
-        if (!this.isAdmin()) throw new Error('Доступ только для администратора');
-        try {
-            const res = await api.getUserByEmail(email);
-            return res.data;
+            return res;
         } catch (err) {
             throw this.parseError(err);
         }
@@ -42,7 +30,7 @@ class UserService {
         if (!this.isAdmin()) throw new Error('Доступ только для администратора');
         try {
             const res = await api.createUser(userDto);
-            return res.data;
+            return res;
         } catch (err) {
             throw this.parseError(err);
         }
@@ -51,7 +39,7 @@ class UserService {
     async updateUser(id, userDto) {
         try {
             const res = await api.updateUser(id, userDto);
-            return res.data;
+            return res;
         } catch (err) {
             throw this.parseError(err);
         }

@@ -9,17 +9,21 @@ function Users() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const userId = localStorage.getItem('userId'); // id текущего пользователя
+        const userId = localStorage.getItem('userId');
         loadUser(userId);
     }, []);
 
     const loadUser = async (id) => {
+        setLoading(true);
+        setError(null);
         try {
             const res = await UserService.getUserById(id);
             setUser(res.data);
             setForm({ name: res.data.name, surname: res.data.surname, email: res.data.email });
-        } catch {
-            setError('Не удалось загрузить профиль');
+        } catch (e) {
+            setError(e.response?.data?.message || e.message || 'Не удалось загрузить профиль');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -27,19 +31,19 @@ function Users() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null);
         setLoading(true);
+        setError(null);
         try {
             await UserService.updateUser(user.id, form);
             alert('Профиль обновлён');
-        } catch {
-            setError('Ошибка обновления');
+        } catch (e) {
+            setError(e.response?.data?.message || e.message || 'Ошибка обновления');
         } finally {
             setLoading(false);
         }
     };
 
-    if (!user) return <div>Загрузка...</div>;
+    if (!user) return <div className="mt-4">Загрузка профиля...</div>;
 
     return (
         <div className="container mt-4">
