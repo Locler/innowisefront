@@ -19,7 +19,7 @@ function Users() {
         try {
             const res = await UserService.getUserById(id);
             setUser(res.data);
-            setForm({ name: res.data.name, surname: res.data.surname, email: res.data.email });
+            setForm({ name: res.data.name, surname: res.data.surname, email: res.data.email , birthDate : res.birthDate});
         } catch (e) {
             setError(e.response?.data?.message || e.message || 'Не удалось загрузить профиль');
         } finally {
@@ -52,6 +52,7 @@ function Users() {
                 <input className="form-control mb-2" name="name" value={form.name} onChange={handleChange} required />
                 <input className="form-control mb-2" name="surname" value={form.surname} onChange={handleChange} required />
                 <input className="form-control mb-2" name="email" type="email" value={form.email} onChange={handleChange} required />
+                <input className="form-control mb-2" name="birthDate"  type="date" value={form.birthDate} onChange={handleChange} required />
                 {error && <div className="alert alert-danger">{error}</div>}
                 <button className="btn btn-primary" disabled={loading}>{loading ? 'Сохранение...' : 'Сохранить'}</button>
             </form>

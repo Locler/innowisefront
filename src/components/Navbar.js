@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import axios from 'axios';
 
-function Navbar({ isLoggedIn, setIsLoggedIn }) {
+function Navbar({isLoggedIn, setIsLoggedIn}) {
     const role = localStorage.getItem('userRole');
     const isAdmin = role === 'ROLE_ADMIN';
 
@@ -21,29 +21,42 @@ function Navbar({ isLoggedIn, setIsLoggedIn }) {
                     <ul className="navbar-nav align-items-center">
                         {!isLoggedIn && (
                             <>
-                                <li className="nav-item mx-2"><Link className="btn btn-outline-success btn-lg" to="/login">Вход</Link></li>
-                                <li className="nav-item mx-2"><Link className="btn btn-outline-success btn-lg" to="/register">Регистрация</Link></li>
+                                <li className="nav-item mx-2"><Link className="btn btn-outline-success btn-lg"
+                                                                    to="/login">Вход</Link></li>
+                                <li className="nav-item mx-2"><Link className="btn btn-outline-success btn-lg"
+                                                                    to="/register">Регистрация</Link></li>
                             </>
                         )}
 
                         {isLoggedIn && !isAdmin && (
                             <>
-                                <li className="nav-item mx-2"><Link className="btn btn-outline-primary btn-lg" to="/profile">Профиль</Link></li>
-                                <li className="nav-item mx-2"><Link className="btn btn-outline-primary btn-lg" to="/cards">Карты</Link></li>
-                                <li className="nav-item mx-2"><Link className="btn btn-outline-primary btn-lg" to="/items">Товары</Link></li>
-                                <li className="nav-item mx-2"><Link className="btn btn-outline-primary btn-lg" to="/orders">Заказы</Link></li>
-                                <li className="nav-item mx-2"><Link className="btn btn-outline-primary btn-lg" to="/payments">Платежи</Link></li>
+                                <li className="nav-item mx-2"><Link className="btn btn-outline-primary btn-lg"
+                                                                    to="/profile">Профиль</Link></li>
+                                <li className="nav-item mx-2"><Link className="btn btn-outline-primary btn-lg"
+                                                                    to="/cards">Карты</Link></li>
+                                <li className="nav-item mx-2"><Link className="btn btn-outline-primary btn-lg"
+                                                                    to="/items">Товары</Link></li>
+                                <li className="nav-item mx-2"><Link className="btn btn-outline-primary btn-lg"
+                                                                    to="/orders">Заказы</Link></li>
+                                <li className="nav-item mx-2"><Link className="btn btn-outline-primary btn-lg"
+                                                                    to="/payments">Платежи</Link></li>
                             </>
                         )}
 
                         {isLoggedIn && isAdmin && (
                             <>
-                                <li className="nav-item mx-2"><Link className="btn btn-primary btn-lg" to="/admin">Дашборд</Link></li>
-                                <li className="nav-item mx-2"><Link className="btn btn-primary btn-lg" to="/admin/users">Пользователи</Link></li>
-                                <li className="nav-item mx-2"><Link className="btn btn-primary btn-lg" to="/admin/cards">Карты</Link></li>
-                                <li className="nav-item mx-2"><Link className="btn btn-primary btn-lg" to="/admin/items">Товары</Link></li>
-                                <li className="nav-item mx-2"><Link className="btn btn-primary btn-lg" to="/admin/orders">Заказы</Link></li>
-                                <li className="nav-item mx-2"><Link className="btn btn-primary btn-lg" to="/admin/payments">Платежи</Link></li>
+                                <li className="nav-item mx-2"><Link className="btn btn-primary btn-lg"
+                                                                    to="/admin">Дашборд</Link></li>
+                                <li className="nav-item mx-2"><Link className="btn btn-primary btn-lg"
+                                                                    to="/admin/users">Пользователи</Link></li>
+                                <li className="nav-item mx-2"><Link className="btn btn-primary btn-lg"
+                                                                    to="/admin/cards">Карты</Link></li>
+                                <li className="nav-item mx-2"><Link className="btn btn-primary btn-lg"
+                                                                    to="/admin/items">Товары</Link></li>
+                                <li className="nav-item mx-2"><Link className="btn btn-primary btn-lg"
+                                                                    to="/admin/orders">Заказы</Link></li>
+                                <li className="nav-item mx-2"><Link className="btn btn-primary btn-lg"
+                                                                    to="/admin/payments">Платежи</Link></li>
                             </>
                         )}
 

@@ -4,7 +4,7 @@ class UserService {
     // Динамическая проверка ролей
     isAdmin() {
         const roles = (localStorage.getItem('userRoles') || '').split(',');
-        return roles.includes('ADMIN') || roles.includes('ROLE_ADMIN');
+        return roles.includes('ROLE_ADMIN');
     }
 
     async getAllUsers(params) {
