@@ -10,6 +10,9 @@ const API_URL = axios.create({
     baseURL: process.env.REACT_APP_API_BASE_URL
 });
 
+// метод для получения только своих заказов
+export const getMyOrders = () =>
+    API_URL.get('/orders/my', { headers: authHeader() });
 
 export const getOrderById = (id) =>
     API_URL.get(`/orders/${id}`, { headers: authHeader() });

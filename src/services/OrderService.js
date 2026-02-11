@@ -1,6 +1,15 @@
 import * as api from '../api/orders';
 
 class OrderService {
+    async getMyOrders() {
+        try {
+            const res = await api.getMyOrders();
+            return res.data;
+        } catch (e) {
+            throw new Error(e.response?.data?.message || 'Ошибка при загрузке ваших заказов');
+        }
+    }
+
     async getOrder(id) {
         try {
             const res = await api.getOrderById(id);

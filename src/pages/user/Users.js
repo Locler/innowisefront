@@ -19,7 +19,7 @@ function Users() {
         try {
             const res = await UserService.getUserById(id);
             setUser(res.data);
-            setForm({ name: res.data.name, surname: res.data.surname, email: res.data.email , birthDate : res.birthDate});
+            setForm({ name: res.data.name, surname: res.data.surname, email: res.data.email , birthDate : res.data.birthDate});
         } catch (e) {
             setError(e.response?.data?.message || e.message || 'Не удалось загрузить профиль');
         } finally {

@@ -1,31 +1,21 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import OrderService from '../../services/OrderService';
-import OrderItemService from '../../services/OrderItemService';
 
 function Orders() {
-    const userId = Number(localStorage.getItem('userId'));
-
     const [orders, setOrders] = useState([]);
-    const [orderItems, setOrderItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        loadData();
+        loadOrders();
     }, []);
 
-    const loadData = async () => {
+    const loadOrders = async () => {
         setLoading(true);
         setError(null);
         try {
-            const ordersRes = await OrderService.getAllOrders({page: 0, size: 100});
-            const myOrders = ordersRes.content.filter(o => o.user?.id === userId);
-
-            const itemsRes = await OrderItemService.getAllOrderItems({page: 0, size: 100});
-            const myOrderItems = itemsRes.content.filter(oi => myOrders.some(o => o.id === oi.orderId));
-
-            setOrders(myOrders);
-            setOrderItems(myOrderItems);
+            const res = await OrderService.getMyOrders();
+            setOrders(res);
         } catch (e) {
             setError(e.message);
         } finally {
@@ -36,10 +26,12 @@ function Orders() {
     return (
         <div className="container mt-4">
             <h2>Мои Заказы</h2>
-            {error && <div className="alert alert-danger">{error}</div>}
-            {loading && <div>Загрузка...</div>}
 
-            {!loading && !error && (
+            {loading && <div>Загрузка...</div>}
+            {error && <div className="alert alert-danger">{error}</div>}
+            {!loading && !error && orders.length === 0 && <div>Заказы отсутствуют</div>}
+
+            {!loading && !error && orders.length > 0 && (
                 <table className="table table-striped">
                     <thead>
                     <tr>
@@ -50,15 +42,14 @@ function Orders() {
                     </tr>
                     </thead>
                     <tbody>
-                    {orders.map(owu => (
-                        <tr key={owu.order?.id}>
-                            <td>{owu.order?.id}</td>
-                            <td>{owu.order?.status}</td>
-                            <td>{owu.order?.totalPrice?.toFixed(2) || 0} ₽</td>
+                    {orders.map(orderDto => (
+                        <tr key={orderDto.order.id}>
+                            <td>{orderDto.order.id}</td>
+                            <td>{orderDto.order.status}</td>
+                            <td>{orderDto.order.totalPrice?.toFixed(2) || 0} ₽</td>
                             <td>
-                                {owu.order?.orderItems?.length
-                                    ? owu.order.orderItems
-                                        .filter(oi => orders.some(o => o.id === oi.orderId))
+                                {orderDto.order.orderItems?.length
+                                    ? orderDto.order.orderItems
                                         .map(oi => `Item ${oi.itemId} x${oi.quantity}`)
                                         .join(', ')
                                     : '—'}

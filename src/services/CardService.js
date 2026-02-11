@@ -1,89 +1,75 @@
 import * as api from '../api/cards';
 
 class CardService {
-    // Динамическая проверка ролей
-    isAdmin() {
-        const roles = (localStorage.getItem('userRoles') || '').split(',');
-        return roles.includes('ROLE_ADMIN');
+    async getAllCards(params) {
+        try {
+            const res = await api.getAllCards(params);
+            return res.data;
+        } catch (e) {
+            throw new Error(e.response?.data?.message || 'Ошибка при загрузке карт');
+        }
     }
 
     async getCardsByUserId(userId) {
         try {
             const res = await api.getMyCards(userId);
-            return res;
-        } catch (err) {
-            throw this.parseError(err);
+            return res.data;
+        } catch (e) {
+            throw new Error(e.response?.data?.message || 'Ошибка при загрузке карт пользователя');
         }
     }
 
-    async getCardById(cardId) {
+    async getCardById(id) {
         try {
-            const res = await api.getCardById(cardId);
-            return res;
-        } catch (err) {
-            throw this.parseError(err);
+            const res = await api.getCardById(id);
+            return res.data;
+        } catch (e) {
+            throw new Error(e.response?.data?.message || 'Ошибка при получении карты');
         }
     }
 
-    async createCard(userId, card) {
+    async createCard(userId, dto) {
         try {
-            const res = await api.createCard(userId, card);
-            return res;
-        } catch (err) {
-            throw this.parseError(err);
+            const res = await api.createCard(userId, dto);
+            return res.data;
+        } catch (e) {
+            throw new Error(e.response?.data?.message || 'Ошибка при создании карты');
         }
     }
 
-    async updateCard(cardId, card) {
+    async updateCard(id, dto) {
         try {
-            const res = await api.updateCard(cardId, card);
-            return res;
-        } catch (err) {
-            throw this.parseError(err);
+            const res = await api.updateCard(id, dto);
+            return res.data;
+        } catch (e) {
+            throw new Error(e.response?.data?.message || 'Ошибка при обновлении карты');
         }
     }
 
-    async deleteCard(cardId) {
-        if (!this.isAdmin()) throw new Error('Доступ только для администратора');
+    async deleteCard(id) {
         try {
-            await api.deleteCard(cardId);
-        } catch (err) {
-            throw this.parseError(err);
+            await api.deleteCard(id);
+        } catch (e) {
+            throw new Error(e.response?.data?.message || 'Ошибка при удалении карты');
         }
     }
 
-    async activateCard(cardId) {
-        if (!this.isAdmin()) throw new Error('Доступ только для администратора');
+    async activateCard(id) {
         try {
-            await api.activateCard(cardId);
-        } catch (err) {
-            throw this.parseError(err);
+            const res = await api.activateCard(id);
+            return res.data;
+        } catch (e) {
+            throw new Error(e.response?.data?.message || 'Ошибка при активации карты');
         }
     }
 
-    async deactivateCard(cardId) {
-        if (!this.isAdmin()) throw new Error('Доступ только для администратора');
+    async deactivateCard(id) {
         try {
-            await api.deactivateCard(cardId);
-        } catch (err) {
-            throw this.parseError(err);
+            const res = await api.deactivateCard(id);
+            return res.data;
+        } catch (e) {
+            throw new Error(e.response?.data?.message || 'Ошибка при деактивации карты');
         }
-    }
-
-    async getAllCards(pageable) {
-        if (!this.isAdmin()) throw new Error('Доступ только для администратора');
-        try {
-            const res = await api.getAllCards(pageable);
-            return res;
-        } catch (err) {
-            throw this.parseError(err);
-        }
-    }
-
-    parseError(err) {
-        if (err.response?.data?.message) return new Error(err.response.data.message);
-        if (err.response?.data) return new Error(JSON.stringify(err.response.data));
-        return new Error(err.message || 'Неизвестная ошибка');
     }
 }
 
