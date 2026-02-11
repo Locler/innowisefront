@@ -117,17 +117,33 @@ function AdminUsers() {
             {!loading && users.length > 0 && (
                 <ul className="list-group">
                     {users.map(user => (
-                        <li key={user.id} className="list-group-item d-flex justify-content-between align-items-center">
+                        <li
+                            key={user.id}
+                            className="list-group-item d-flex justify-content-between align-items-center"
+                        >
                             <div>
-                                <strong>{user.name} {user.surname}</strong> — {user.email} <br />
+                                <strong>{user.name} {user.surname}</strong> (ID: {user.id}) — {user.email} <br />
                                 Активен: {user.active ? 'Да' : 'Нет'}
                             </div>
-                            <div>
-                                <button className="btn btn-sm btn-warning me-2" onClick={() => toggleActive(user)}>
+                            <div className="d-flex gap-2">
+                                <button
+                                    className="btn btn-sm btn-warning"
+                                    onClick={() => toggleActive(user)}
+                                >
                                     {user.active ? 'Деактивировать' : 'Активировать'}
                                 </button>
-                                <button className="btn btn-sm btn-secondary me-2" onClick={() => handleEdit(user)}>Редактировать</button>
-                                <button className="btn btn-sm btn-danger" onClick={() => handleDelete(user.id)}>Удалить</button>
+                                <button
+                                    className="btn btn-sm btn-secondary"
+                                    onClick={() => handleEdit(user)}
+                                >
+                                    Редактировать
+                                </button>
+                                <button
+                                    className="btn btn-sm btn-danger"
+                                    onClick={() => handleDelete(user.id)}
+                                >
+                                    Удалить
+                                </button>
                             </div>
                         </li>
                     ))}

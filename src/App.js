@@ -54,7 +54,7 @@ function App() {
                         element={
                             isLoggedIn
                                 ? <Navigate to={isAdmin ? "/admin" : "/profile"} replace />
-                                : <Register />
+                                : <Register setIsLoggedIn={setIsLoggedIn} />
                         }
                     />
 

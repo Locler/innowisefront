@@ -1,56 +1,149 @@
 import React, { useEffect, useState } from 'react';
 import PaymentService from '../../services/PaymentService';
+import OrderService from '../../services/OrderService';
 
 function Payments() {
     const [payments, setPayments] = useState([]);
+    const [orders, setOrders] = useState([]);
+    const [selectedOrderId, setSelectedOrderId] = useState('');
     const [loading, setLoading] = useState(true);
+    const [creating, setCreating] = useState(false);
     const [error, setError] = useState(null);
+
     const userId = localStorage.getItem('userId');
 
     useEffect(() => {
-        loadPayments();
+        loadData();
     }, []);
 
-    const loadPayments = async () => {
+    const loadData = async () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await PaymentService.getPaymentsByUser(userId);
-            setPayments(res || []);
+            // Загружаем платежи пользователя
+            const userPayments = await PaymentService.getPaymentsByUser(userId);
+            setPayments(userPayments || []);
+
+            // Загружаем заказы пользователя
+            const userOrders = await OrderService.getMyOrders();
+            setOrders(userOrders || []);
         } catch (e) {
-            setError(e.message);
+            setError(e.message || 'Ошибка при загрузке данных');
         } finally {
             setLoading(false);
         }
     };
 
+    const handleCreatePayment = async () => {
+        if (!selectedOrderId) {
+            alert('Выберите заказ для оплаты');
+            return;
+        }
+
+        setCreating(true);
+        setError(null);
+
+        try {
+            const order = orders.find(o => o.order.id === parseInt(selectedOrderId));
+            if (!order) throw new Error('Заказ не найден');
+
+            const dto = {
+                orderId: order.order.id,
+                userId: parseInt(userId),
+                paymentAmount: order.order.totalPrice,
+                status: 'PENDING'
+            };
+
+            const newPayment = await PaymentService.createPayment(dto);
+            setPayments(prev => [...prev, newPayment]);
+            setSelectedOrderId('');
+        } catch (e) {
+            setError(e.message || 'Ошибка при создании платежа');
+        } finally {
+            setCreating(false);
+        }
+    };
+
+    const handleDeletePayment = async (paymentId) => {
+        if (!window.confirm('Удалить платеж?')) return;
+
+        setError(null);
+        try {
+            await PaymentService.deletePayment(paymentId);
+            setPayments(prev => prev.filter(p => p.id !== paymentId));
+        } catch (e) {
+            setError(e.message || 'Ошибка при удалении платежа');
+        }
+    };
+
     return (
         <div className="container mt-4">
-            <h2>Пользователь: Мои платежи</h2>
-            {error && <div className="alert alert-danger">{error}</div>}
-            {loading && <div>Загрузка...</div>}
+            <h2>Мои платежи</h2>
 
-            {!loading && !error && (
-                <table className="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Order ID</th>
-                        <th>Сумма</th>
-                        <th>Статус</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {payments.map(p => (
-                        <tr key={p.id}>
-                            <td>{p.id}</td>
-                            <td>{p.orderId}</td>
-                            <td>{p.paymentAmount?.toFixed(2) || 0} ₽</td>
-                            <td>{p.status}</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
+            {error && <div className="alert alert-danger">{error}</div>}
+            {loading && <div>Загрузка данных...</div>}
+
+            {!loading && (
+                <>
+                    <div className="card p-3 mb-4">
+                        <h5>Создать новый платеж</h5>
+                        <div className="d-flex gap-2 align-items-center">
+                            <select
+                                className="form-select"
+                                value={selectedOrderId}
+                                onChange={e => setSelectedOrderId(e.target.value)}
+                            >
+                                <option value="">Выберите заказ</option>
+                                {orders.map(o => (
+                                    <option key={o.order.id} value={o.order.id}>
+                                        Заказ #{o.order.id} — Сумма: {o.order.totalPrice?.toFixed(2)} ₽ — Статус: {o.order.status}
+                                    </option>
+                                ))}
+                            </select>
+                            <button
+                                className="btn btn-primary"
+                                onClick={handleCreatePayment}
+                                disabled={creating}
+                            >
+                                {creating ? 'Создание...' : 'Создать платеж'}
+                            </button>
+                        </div>
+                    </div>
+
+                    {payments.length === 0 && <div>Платежи отсутствуют</div>}
+
+                    {payments.length > 0 && (
+                        <table className="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Заказ</th>
+                                <th>Сумма</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {payments.map(p => (
+                                <tr key={p.id}>
+                                    <td>{p.id}</td>
+                                    <td>{p.orderId}</td>
+                                    <td>{p.paymentAmount?.toFixed(2) || 0} ₽</td>
+                                    <td>{p.status}</td>
+                                    <td>
+                                        <button
+                                            className="btn btn-sm btn-danger"
+                                            onClick={() => handleDeletePayment(p.id)}
+                                        >
+                                            Удалить
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    )}
+                </>
             )}
         </div>
     );

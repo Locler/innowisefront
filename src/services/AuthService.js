@@ -8,14 +8,14 @@ class AuthService {
         const accessToken = response.data.accessToken;
         const refreshToken = response.data.refreshToken;
 
-        // Сохраняем токены
+        // Сохраняем токены в localStorage
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
 
         // Настраиваем axios для будущих запросов
         authApi.API_URL.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
-        // Валидация токена через query-параметр
+        // Валидация токена
         const validateResponse = await this.validate();
 
         const role = validateResponse.data.role;
@@ -30,7 +30,15 @@ class AuthService {
 
     // Регистрация
     async register(body) {
-        return authApi.register(body);
+        // Используем точный путь /register
+        const response = await authApi.register(body);
+
+        // Проверка на успешную регистрацию
+        if (!response.data?.auth || response.data.auth.status !== 'success') {
+            throw new Error('Регистрация не удалась');
+        }
+
+        return response.data;
     }
 
     // Валидация токена
@@ -39,8 +47,8 @@ class AuthService {
         if (!token) throw new Error('Нет токена');
 
         // Передаём токен как query-параметр
-        return authApi.API_URL.get('/auth/validate', {
-            params: { token }
+        return await authApi.API_URL.get('/auth/validate', {
+            params: {token}
         });
     }
 

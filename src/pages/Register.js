@@ -17,16 +17,21 @@ function Register({ setIsLoggedIn }) {
         setError('');
 
         try {
-            // Тело запроса регистрации
+            // Формируем тело запроса
             const body = {
                 credentials: { username, password, role: 'ROLE_USER' },
                 profile: { name, surname, email, birthDate }
             };
 
             // 1️⃣ Регистрация
-            await AuthService.register(body);
+            const registerResponse = await AuthService.register(body);
 
-            // 2️⃣ Логин и получение role + userId
+            // Проверяем статус
+            if (registerResponse.auth?.status !== 'success') {
+                throw new Error('Регистрация не удалась');
+            }
+
+            // 2️⃣ Логин сразу после регистрации
             const userData = await AuthService.login(username, password);
 
             setIsLoggedIn(true);
@@ -38,7 +43,7 @@ function Register({ setIsLoggedIn }) {
             );
 
         } catch (err) {
-            setError(err.response?.data?.error?.message || 'Регистрация не удалась');
+            setError(err.message || 'Регистрация не удалась');
         }
     };
 
