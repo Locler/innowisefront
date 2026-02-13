@@ -86,6 +86,7 @@ function AdminCards() {
         <div className="container mt-4">
             <h2>Админ: Карты</h2>
 
+            {/* Форма */}
             <form onSubmit={handleSubmit} className="card p-3 mb-4">
                 <h5>{editingId ? 'Редактировать карту' : 'Создать карту'}</h5>
                 <input
@@ -128,31 +129,52 @@ function AdminCards() {
                 <button className="btn btn-primary">{editingId ? 'Обновить' : 'Создать'}</button>
             </form>
 
+            {/* Таблица карт */}
             {loading && <div>Загрузка карт...</div>}
 
             {!loading && cards.length > 0 && (
-                <ul className="list-group">
-                    {cards.map(card => (
-                        <li key={card.id} className="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>{card.number}</strong> — {card.holder} <br />
-                                До {card.expirationDate} — {card.active ? 'Активна' : 'Неактивна'}
-                            </div>
-                            <div className="d-flex gap-2">
-                                <button className="btn btn-sm btn-warning" onClick={() => toggleActive(card)}>
-                                    {card.active ? 'Деактивировать' : 'Активировать'}
-                                </button>
-                                <button className="btn btn-sm btn-secondary" onClick={() => handleEdit(card)}>
-                                    Редактировать
-                                </button>
-                                <button className="btn btn-sm btn-danger" onClick={() => handleDelete(card.id)}>
-                                    Удалить
-                                </button>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
+                <div className="card p-3">
+                    <h5>Список карт</h5>
+                    <table className="table table-striped table-bordered align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User ID</th>
+                            <th>Номер карты</th>
+                            <th>Владелец</th>
+                            <th>Срок действия</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {cards.map(card => (
+                            <tr key={card.id}>
+                                <td>{card.id}</td>
+                                <td>{card.userId}</td>
+                                <td>{card.number}</td>
+                                <td>{card.holder}</td>
+                                <td>{card.expirationDate}</td>
+                                <td>{card.active ? 'Активна' : 'Неактивна'}</td>
+                                <td className="d-flex gap-2">
+                                    <button className="btn btn-sm btn-warning" onClick={() => toggleActive(card)}>
+                                        {card.active ? 'Деактивировать' : 'Активировать'}
+                                    </button>
+                                    <button className="btn btn-sm btn-secondary" onClick={() => handleEdit(card)}>
+                                        Редактировать
+                                    </button>
+                                    <button className="btn btn-sm btn-danger" onClick={() => handleDelete(card.id)}>
+                                        Удалить
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
             )}
+
+            {!loading && cards.length === 0 && <div className="text-muted">Карт пока нет</div>}
         </div>
     );
 }

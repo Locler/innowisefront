@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PaymentService from '../../services/PaymentService';
 import OrderService from '../../services/OrderService';
+import { useLocation } from 'react-router-dom';
 
 function Payments() {
     const [payments, setPayments] = useState([]);
@@ -12,21 +13,31 @@ function Payments() {
 
     const userId = localStorage.getItem('userId');
 
+    // Чтение orderId из query
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const queryOrderId = params.get('orderId');
+
     useEffect(() => {
+        if (queryOrderId) setSelectedOrderId(queryOrderId);
         loadData();
-    }, []);
+    }, [queryOrderId]);
 
     const loadData = async () => {
         setLoading(true);
         setError(null);
         try {
-            // Загружаем платежи пользователя
             const userPayments = await PaymentService.getPaymentsByUser(userId);
             setPayments(userPayments || []);
 
-            // Загружаем заказы пользователя
             const userOrders = await OrderService.getMyOrders();
-            setOrders(userOrders || []);
+            // Нормализация totalPrice
+            const normalizedOrders = (userOrders || []).map(o => ({
+                ...o.order,
+                id: o.order.id,
+                totalPrice: o.order.total_price ?? 0
+            }));
+            setOrders(normalizedOrders);
         } catch (e) {
             setError(e.message || 'Ошибка при загрузке данных');
         } finally {
@@ -44,13 +55,13 @@ function Payments() {
         setError(null);
 
         try {
-            const order = orders.find(o => o.order.id === parseInt(selectedOrderId));
+            const order = orders.find(o => o.id === parseInt(selectedOrderId));
             if (!order) throw new Error('Заказ не найден');
 
             const dto = {
-                orderId: order.order.id,
+                orderId: order.id,
                 userId: parseInt(userId),
-                paymentAmount: order.order.totalPrice,
+                paymentAmount: order.totalPrice,
                 status: 'PENDING'
             };
 
@@ -95,8 +106,8 @@ function Payments() {
                             >
                                 <option value="">Выберите заказ</option>
                                 {orders.map(o => (
-                                    <option key={o.order.id} value={o.order.id}>
-                                        Заказ #{o.order.id} — Сумма: {o.order.totalPrice?.toFixed(2)} ₽ — Статус: {o.order.status}
+                                    <option key={o.id} value={o.id}>
+                                        Заказ #{o.id} — Сумма: {o.totalPrice.toFixed(2)} ₽ — Статус: {o.status}
                                     </option>
                                 ))}
                             </select>

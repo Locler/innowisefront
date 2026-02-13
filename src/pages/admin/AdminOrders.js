@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import OrderService from '../../services/OrderService';
 
-/**
- * FSM с backend
- */
+
 const STATUS_TRANSITIONS = {
     NEW: ["PAID", "CANCELLED"],
     PAID: ["COMPLETED"],

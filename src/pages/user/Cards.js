@@ -19,7 +19,7 @@ function Cards() {
         setError(null);
         try {
             const res = await CardService.getCardsByUserId(userId);
-            setCards(res.data || []);
+            setCards(res || []);
         } catch (e) {
             setError(e.response?.data?.message || e.message || 'Не удалось загрузить карты');
         } finally {
@@ -56,10 +56,21 @@ function Cards() {
         setError(null);
     };
 
+    const handleDelete = async (id) => {
+        if (!window.confirm('Удалить карту?')) return;
+        try {
+            await CardService.deleteCard(id);
+            setCards(prev => prev.filter(c => c.id !== id));
+        } catch (e) {
+            alert(e.response?.data?.message || e.message || 'Ошибка при удалении карты');
+        }
+    };
+
     return (
         <div className="container mt-4">
             <h2>Мои карты</h2>
 
+            {/* Форма добавления/редактирования карты */}
             <form onSubmit={handleSubmit} className="card p-3 mb-4">
                 <h5>{editingId ? 'Обновить карту' : 'Добавить карту'}</h5>
 
@@ -77,21 +88,44 @@ function Cards() {
                 <button className="btn btn-primary" disabled={loading}>{loading ? 'Сохранение...' : 'Сохранить'}</button>
             </form>
 
-            {loading && !cards.length ? <div>Загрузка карт...</div> : null}
+            {/* Таблица карт */}
+            {cards.length > 0 && (
+                <div className="card p-3">
+                    <h5>Ваши карты</h5>
+                    <table className="table table-striped table-bordered align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Номер карты</th>
+                            <th>Владелец</th>
+                            <th>Срок действия</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {cards.map(card => (
+                            <tr key={card.id}>
+                                <td>{card.id}</td>
+                                <td>{card.number}</td>
+                                <td>{card.holder}</td>
+                                <td>{card.expirationDate}</td>
+                                <td className="d-flex gap-2">
+                                    <button className="btn btn-sm btn-outline-secondary" onClick={() => startEdit(card)} disabled={loading}>
+                                        Редактировать
+                                    </button>
+                                    <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(card.id)} disabled={loading}>
+                                        Удалить
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
-            <ul className="list-group">
-                {cards.map(card => (
-                    <li key={card.id} className="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>{card.number}</strong> — {card.holder} <br />
-                            до {card.expirationDate}
-                        </div>
-                        <button className="btn btn-sm btn-outline-secondary" onClick={() => startEdit(card)} disabled={loading}>
-                            Редактировать
-                        </button>
-                    </li>
-                ))}
-            </ul>
+            {loading && !cards.length && <div>Загрузка карт...</div>}
+            {cards.length === 0 && !loading && <div className="text-muted">Карты отсутствуют</div>}
         </div>
     );
 }
