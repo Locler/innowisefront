@@ -56,16 +56,6 @@ function Cards() {
         setError(null);
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm('Удалить карту?')) return;
-        try {
-            await CardService.deleteCard(id);
-            setCards(prev => prev.filter(c => c.id !== id));
-        } catch (e) {
-            alert(e.response?.data?.message || e.message || 'Ошибка при удалении карты');
-        }
-    };
-
     return (
         <div className="container mt-4">
             <h2>Мои карты</h2>
@@ -112,9 +102,6 @@ function Cards() {
                                 <td className="d-flex gap-2">
                                     <button className="btn btn-sm btn-outline-secondary" onClick={() => startEdit(card)} disabled={loading}>
                                         Редактировать
-                                    </button>
-                                    <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(card.id)} disabled={loading}>
-                                        Удалить
                                     </button>
                                 </td>
                             </tr>
