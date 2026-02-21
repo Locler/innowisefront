@@ -7,7 +7,13 @@ function AdminUsers() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const [form, setForm] = useState({ name: '', surname: '', email: '' });
+    const [form, setForm] = useState({
+        name: '',
+        surname: '',
+        email: '',
+        birthDate: ''
+    });
+
     const [editingId, setEditingId] = useState(null);
 
     useEffect(() => {
@@ -42,7 +48,14 @@ function AdminUsers() {
             } else {
                 await UserService.createUser(form);
             }
-            setForm({ name: '', surname: '', email: '' });
+
+            setForm({
+                name: '',
+                surname: '',
+                email: '',
+                birthDate: ''
+            });
+
             loadUsers();
         } catch (e) {
             setError(e.message);
@@ -50,7 +63,12 @@ function AdminUsers() {
     };
 
     const handleEdit = user => {
-        setForm({ name: user.name, surname: user.surname, email: user.email });
+        setForm({
+            name: user.name,
+            surname: user.surname,
+            email: user.email,
+            birthDate: user.birthDate || ''
+        });
         setEditingId(user.id);
     };
 
@@ -79,11 +97,13 @@ function AdminUsers() {
     return (
         <div className="container mt-4">
             <h2>Админ: Пользователи</h2>
+
             {error && <div className="alert alert-danger">{error}</div>}
             {loading && <div>Загрузка пользователей...</div>}
 
             <form onSubmit={handleSubmit} className="card p-3 mb-4">
                 <h5>{editingId ? 'Редактировать пользователя' : 'Создать пользователя'}</h5>
+
                 <input
                     className="form-control mb-2"
                     name="name"
@@ -92,6 +112,7 @@ function AdminUsers() {
                     onChange={handleChange}
                     required
                 />
+
                 <input
                     className="form-control mb-2"
                     name="surname"
@@ -100,6 +121,7 @@ function AdminUsers() {
                     onChange={handleChange}
                     required
                 />
+
                 <input
                     type="email"
                     className="form-control mb-2"
@@ -109,6 +131,16 @@ function AdminUsers() {
                     onChange={handleChange}
                     required
                 />
+
+                <input
+                    type="date"
+                    className="form-control mb-2"
+                    name="birthDate"
+                    value={form.birthDate}
+                    onChange={handleChange}
+                    required
+                />
+
                 <button type="submit" className="btn btn-primary">
                     {editingId ? 'Обновить' : 'Создать'}
                 </button>
@@ -123,8 +155,10 @@ function AdminUsers() {
                         >
                             <div>
                                 <strong>{user.name} {user.surname}</strong> (ID: {user.id}) — {user.email} <br />
+                                Дата рождения: {user.birthDate || '—'} <br />
                                 Активен: {user.active ? 'Да' : 'Нет'}
                             </div>
+
                             <div className="d-flex gap-2">
                                 <button
                                     className="btn btn-sm btn-warning"
@@ -132,12 +166,14 @@ function AdminUsers() {
                                 >
                                     {user.active ? 'Деактивировать' : 'Активировать'}
                                 </button>
+
                                 <button
                                     className="btn btn-sm btn-secondary"
                                     onClick={() => handleEdit(user)}
                                 >
                                     Редактировать
                                 </button>
+
                                 <button
                                     className="btn btn-sm btn-danger"
                                     onClick={() => handleDelete(user.id)}

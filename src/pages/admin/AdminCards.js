@@ -7,7 +7,14 @@ function AdminCards() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const [form, setForm] = useState({ userId: '', number: '', holder: '', expirationDate: '' });
+    const [form, setForm] = useState({
+        userId: '',
+        number: '',
+        holder: '',
+        expirationDate: '',
+        active: true
+    });
+
     const [editingId, setEditingId] = useState(null);
 
     useEffect(() => {
@@ -28,22 +35,47 @@ function AdminCards() {
     };
 
     const handleChange = e => {
-        const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
+        const { name, value, type, checked } = e.target;
+        setForm(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
     };
 
     const handleSubmit = async e => {
         e.preventDefault();
         setError(null);
+
         try {
             if (editingId) {
-                await CardService.updateCard(editingId, form);
+                // ✅ правильный DTO как в Postman
+                const updateDto = {
+                    number: form.number,
+                    holder: form.holder,
+                    expirationDate: form.expirationDate,
+                    active: form.active
+                };
+
+                await CardService.updateCard(editingId, updateDto);
                 setEditingId(null);
             } else {
                 if (!form.userId) return alert('Укажите User ID');
-                await CardService.createCard(form.userId, form);
+
+                await CardService.createCard(form.userId, {
+                    number: form.number,
+                    holder: form.holder,
+                    expirationDate: form.expirationDate
+                });
             }
-            setForm({ userId: '', number: '', holder: '', expirationDate: '' });
+
+            setForm({
+                userId: '',
+                number: '',
+                holder: '',
+                expirationDate: '',
+                active: true
+            });
+
             await loadCards();
         } catch (e) {
             setError(e.message);
@@ -55,7 +87,8 @@ function AdminCards() {
             userId: card.userId,
             number: card.number,
             holder: card.holder,
-            expirationDate: card.expirationDate
+            expirationDate: card.expirationDate,
+            active: card.active
         });
         setEditingId(card.id);
     };
@@ -89,15 +122,19 @@ function AdminCards() {
             {/* Форма */}
             <form onSubmit={handleSubmit} className="card p-3 mb-4">
                 <h5>{editingId ? 'Редактировать карту' : 'Создать карту'}</h5>
-                <input
-                    type="number"
-                    className="form-control mb-2"
-                    name="userId"
-                    placeholder="User ID"
-                    value={form.userId}
-                    onChange={handleChange}
-                    required={!editingId}
-                />
+
+                {!editingId && (
+                    <input
+                        type="number"
+                        className="form-control mb-2"
+                        name="userId"
+                        placeholder="User ID"
+                        value={form.userId}
+                        onChange={handleChange}
+                        required
+                    />
+                )}
+
                 <input
                     type="text"
                     className="form-control mb-2"
@@ -107,6 +144,7 @@ function AdminCards() {
                     onChange={handleChange}
                     required
                 />
+
                 <input
                     type="text"
                     className="form-control mb-2"
@@ -116,20 +154,38 @@ function AdminCards() {
                     onChange={handleChange}
                     required
                 />
+
                 <input
                     type="date"
                     className="form-control mb-2"
                     name="expirationDate"
-                    placeholder="Срок действия"
                     value={form.expirationDate}
                     onChange={handleChange}
                     required
                 />
+
+                {/*active только при редактировании */}
+                {editingId && (
+                    <div className="form-check mb-2">
+                        <input
+                            type="checkbox"
+                            className="form-check-input"
+                            name="active"
+                            checked={form.active}
+                            onChange={handleChange}
+                        />
+                        <label className="form-check-label">Активна</label>
+                    </div>
+                )}
+
                 {error && <div className="alert alert-danger">{error}</div>}
-                <button className="btn btn-primary">{editingId ? 'Обновить' : 'Создать'}</button>
+
+                <button className="btn btn-primary">
+                    {editingId ? 'Обновить' : 'Создать'}
+                </button>
             </form>
 
-            {/* Таблица карт */}
+            {/* Таблица */}
             {loading && <div>Загрузка карт...</div>}
 
             {!loading && cards.length > 0 && (
@@ -157,13 +213,24 @@ function AdminCards() {
                                 <td>{card.expirationDate}</td>
                                 <td>{card.active ? 'Активна' : 'Неактивна'}</td>
                                 <td className="d-flex gap-2">
-                                    <button className="btn btn-sm btn-warning" onClick={() => toggleActive(card)}>
+                                    <button
+                                        className="btn btn-sm btn-warning"
+                                        onClick={() => toggleActive(card)}
+                                    >
                                         {card.active ? 'Деактивировать' : 'Активировать'}
                                     </button>
-                                    <button className="btn btn-sm btn-secondary" onClick={() => handleEdit(card)}>
+
+                                    <button
+                                        className="btn btn-sm btn-secondary"
+                                        onClick={() => handleEdit(card)}
+                                    >
                                         Редактировать
                                     </button>
-                                    <button className="btn btn-sm btn-danger" onClick={() => handleDelete(card.id)}>
+
+                                    <button
+                                        className="btn btn-sm btn-danger"
+                                        onClick={() => handleDelete(card.id)}
+                                    >
                                         Удалить
                                     </button>
                                 </td>
@@ -174,7 +241,9 @@ function AdminCards() {
                 </div>
             )}
 
-            {!loading && cards.length === 0 && <div className="text-muted">Карт пока нет</div>}
+            {!loading && cards.length === 0 && (
+                <div className="text-muted">Карт пока нет</div>
+            )}
         </div>
     );
 }
